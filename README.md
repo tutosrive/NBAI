@@ -13,3 +13,11 @@ git clone https://github.com/tutosrive/NBAI.git
 ```shell
 git pull -u origin main
 ```
+
+3. Añadir cambios
+
+```shell
+# Ejecute uno a uno
+git add .
+git commit -m "Add here your message"
+```
