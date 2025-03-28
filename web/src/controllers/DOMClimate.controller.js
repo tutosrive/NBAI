@@ -20,7 +20,6 @@ export default class DOMClimate {
   }
 
   load_climate_map() {
-    // FUNCTIONAL
     const html_card_weather = () => {
       this.#container.classList.remove('w-container-climate2');
       this.#container.classList.add('w-container-climate1');
