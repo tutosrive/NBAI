@@ -12,11 +12,9 @@ export async function send_data(url, data) {
 }
 
 /**
-* Get the ranking of the game
-* @returns {Array} Ranking of the game
-*/
-
-export async function get_ranking(url) {
-   
-   return fetch_JSON(url);
+ * Get the ranking of the game
+ * @returns {Array} Ranking of the game
+ */
+export async function get_data(url, endpoint) {
+  return fetch_JSON(`${url}/${endpoint}`);
 }
