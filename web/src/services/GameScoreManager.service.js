@@ -12,8 +12,8 @@ export async function send_data(url, data) {
 }
 
 /**
- * Get the ranking of the game
- * @returns {Array} Ranking of the game
+ * Get data from backend
+ * @returns {JSON} Obtained Data from backend
  */
 export async function get_data(url, endpoint) {
   return fetch_JSON(`${url}/${endpoint}`);
