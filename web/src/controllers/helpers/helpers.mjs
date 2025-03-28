@@ -3,7 +3,7 @@
  * @param {String} url URL to send the request
  * @param {{method: string, heders: {}, body: {name_key: any}}} config Objet with rquest config, `headers`, `method`, e.t.c.
  */
-export async function fetch_JSON(url, config = null) {
+export async function fetch_JSON(url, config = {}) {
   if (config) {
     // Validate type config === {key:value}
     if (!(config instanceof Object) && !Array.isArray(config) && !config) throw new Error('La configuración debe ser un objeto {key: value}');
@@ -12,7 +12,8 @@ export async function fetch_JSON(url, config = null) {
     // Cast Javascript Object to StringJSON
     config.body = JSON.stringify(config.body);
   }
-  config.headers['Accept'] = 'application/json';
+  if (!Object.hasOwn(config, 'headers')) config['headers'] = { Accept: 'application/json' };
+  else config.headers['Accept'] = 'application/json';
   // Try request
   try {
     const request = await fetch(url, config);

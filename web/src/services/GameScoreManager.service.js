@@ -10,3 +10,13 @@ export async function send_data(url, data) {
   const config = { method: 'POST', body: data, headers: { 'Content-Type': 'application/json' } }; // Request configuration
   return await fetch_JSON(url, config);
 }
+
+/**
+* Get the ranking of the game
+* @returns {Array} Ranking of the game
+*/
+
+export async function get_ranking(url) {
+   
+   return fetch_JSON(url);
+}
