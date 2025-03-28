@@ -1,0 +1,24 @@
+/* Card body container */
+.climate-card {
+  box-shadow: 6px 5px 14px rgba(0, 0, 0, 0.637);
+}
+/* To give shadow to img in the backdrop */
+.shadow-img {
+  filter: drop-shadow(3px 3px 1px rgba(0, 0, 0, 0.295));
+}
+/* Main container card climate */
+.w-container-climate1 {
+  width: 300px;
+}
+.w-container-climate2 {
+  width: 70px;
+}
+/* Vertical separator */
+.vl {
+  height: 40px;
+  width: 1px;
+  border-left: 1px solid rgba(0, 0, 0, 0.336);
+  position: absolute;
+  display: inline;
+  right: 150px;
+}
