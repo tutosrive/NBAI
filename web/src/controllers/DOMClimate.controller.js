@@ -14,7 +14,7 @@ export default class DOMClimate {
     this.#container = container;
     this.#climate = climate;
     this.#icon_weather = icon;
-    this.#climate.main.temp = Helpers.convert_kelvin_celcius(this.#climate.main.temp);
+    this.#climate.main.temp = Helps.convert_kelvin_celcius(this.#climate.main.temp);
     this.#page = page;
     this.load_climate_map();
   }
@@ -26,7 +26,7 @@ export default class DOMClimate {
       return `
         <div class="row climate-card rounded-pill align-items-center p-2">
            <div class="col-lg-6">
-            <div class="text-center">${window.country_name}</div>
+            <div class="text-center">${COUNTRY_NAME}</div>
             <div class="text-center">${this.#climate.weather[0].description}</div>
            </div>
            <div class="vl"></div>
