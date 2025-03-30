@@ -27,4 +27,28 @@ export async function fetch_JSON(url, config = {}) {
   }
 }
 
+/**
+ * Loads an HTML resource into an application layer
+ * @param {String} url The route where the resource is located
+ * @param {String} container Optionally, the layer where the content is inserted
+ * @returns If the second argument is given, the container is returned, if not the resource is returned.
+ */
+export async function fetchText(url, container = null) {
+  try {
+    const response = await fetch(url);
+    if (response.ok) {
+      const html = await response.text();
+      const element = document.querySelector(container);
+      if (element) {
+        element.innerHTML = html;
+      }
+      return { status: response.status, data: element || html }; // para permitir encadenamiento o para retornar el HTML
+    } else {
+      return { status: response.status, data: response.statusText, error: `Error trying to access ${url}` };
+    }
+  } catch (e) {
+    return { status: response.status, data: null, error: `Error trying to access ${url}` };
+  }
+}
+
 export const convert_kelvin_celcius = (kelkin_grades) => (kelkin_grades - 273.15).toFixed(2);
