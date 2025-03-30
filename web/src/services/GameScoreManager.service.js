@@ -15,6 +15,6 @@ export async function send_data(url, data) {
  * Get data from backend
  * @returns {JSON} Obtained Data from backend
  */
-export async function get_data(url, endpoint) {
-  return fetch_JSON(`${url}/${endpoint}`);
+export async function get_data(url) {
+  return fetch_JSON(url);
 }
