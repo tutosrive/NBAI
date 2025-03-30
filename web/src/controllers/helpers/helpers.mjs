@@ -23,7 +23,7 @@ export async function fetch_JSON(url, config = {}) {
     }
     return { status: request.status, data: null };
   } catch (e) {
-    return { status: 500, data: 'Internal Server Error', error: { message: e.message, code: e.cause.errno } };
+    return { status: 500, data: 'Internal Server Error', error: e };
   }
 }
 
