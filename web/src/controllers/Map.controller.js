@@ -7,11 +7,11 @@ export async function init() {
     load_maps();
   }
   
-  let BOARD_SIZE = 10;
-  let SHIPS = [5, 4, 3, 3, 2, 2];
+  let BOARD_SIZE = 10;// cambiar para que sea configurable
+  let SHIPS = [5, 4, 3, 3, 2, 2];// cambiar para que sea usando la clase Ship
+  
   let currentTurn;
   let orientation;
-  
   let playerBoard;
   let machineBoard;
   let orientationBtn;
@@ -173,9 +173,9 @@ export async function init() {
     currentTurn = "player";
     orientation = "horizontal";
   
-    playerBoard = document.getElementById("player-board");
-    machineBoard = document.getElementById("machine-board");
-    orientationBtn = document.getElementById("orientation-button");
+    playerBoard = document.querySelector("#player-board");
+    machineBoard = document.querySelector("#machine-board");
+    orientationBtn = document.querySelector("#orientation-button");
   
     playerShips = [];
     machineShips = [];
@@ -184,7 +184,7 @@ export async function init() {
       orientation = orientation === "horizontal" ? "vertical" : "horizontal";
       orientationBtn.textContent = `Cambiar Orientación (${orientation.charAt(0).toUpperCase() + orientation.slice(1)})`;
     });
-    const toggleBtn = document.getElementById("toggle-debug");
+    const toggleBtn = document.querySelector("#toggle-debug");
     let debugMode = false;
   
     toggleBtn.addEventListener("click", () => {
