@@ -1,6 +1,6 @@
 export async function init() {
     const container = document.querySelector("#main");
-    const res = await fetch("../html/map.html");
+    const res = await fetch("./html/Map.html");
     const html = await res.text();
     console.log(html);
     container.innerHTML = html;
