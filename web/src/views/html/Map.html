@@ -1,0 +1,21 @@
+<!-- Main content -->
+<div class="flex-grow-1 p-3">
+    <h1 class="text-center">Batalla Naval</h1>
+    <div class="text-center mb-3">
+      <button id="orientation-button" class="btn btn-success">Cambiar Orientación (Horizontal)</button>
+      <button id="toggle-debug" class="btn btn-secondary ms-2">Modo Debug: Mostrar/Ocultar Barcos</button>
+    </div>
+  
+    <div class="boards d-flex justify-content-around flex-wrap">
+      <div class="board-container text-center">
+        <h2>Jugador</h2>
+        <div id="player-board" class="board mx-auto"></div>
+      </div>
+      <div class="board-container text-center">
+        <h2>Máquina</h2>
+        <div id="machine-board" class="board mx-auto"></div>
+      </div>
+    </div>
+  </div>
+  <script defer src="../controllers/Map.controller.js"></script>
+  
