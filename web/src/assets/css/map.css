@@ -39,6 +39,7 @@ body {
     border: 1px solid #333;
     cursor: pointer;
     user-select: none;
+    overflow:hidden;
   }
   
   .cell.ship {
