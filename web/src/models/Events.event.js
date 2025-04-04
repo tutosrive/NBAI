@@ -7,4 +7,5 @@ export default class Events extends EventTarget {
   spread(event_name, data) {
     document.dispatchEvent(new CustomEvent(event_name, { detail: data }));
   }
+  
 }
