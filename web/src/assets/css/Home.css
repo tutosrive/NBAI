@@ -1,0 +1,156 @@
+/* styles.css - Versión optimizada con distribución estratégica de colores */
+:root {
+  /* Paleta Ravenclaw - Hogwarts Legacy */
+  --color-1: #212930; /* Azul principal oscuro - para elementos estructurales */
+  --color-2: #4a6070; /* Azul medio - para fondos secundarios */
+  --color-3: #5d8aa8; /* Azul cielo - para acentos y detalles */
+  --color-4: #946b2d; /* Bronce - para interacciones y elementos nobles */
+  --color-5: #d4af37; /* Oro metálico (variante brillante del bronce) - para destacados */
+
+  /* Colores neutros (combinan con la paleta) */
+  --color-light: #f0f4f8; /* Blanco azulado claro - para texto sobre fondos oscuros */
+  --color-dark: #273642; /* Azul noche oscuro - para texto sobre fondos claros */
+}
+
+body {
+  overflow-x: hidden;
+  padding: 0;
+  margin: 0;
+}
+.sidebar {
+  width: 80px;
+  position: fixed;
+  height: 100vh;
+  z-index: 1000;
+}
+.main-content {
+  margin-left: 80px;
+  padding: 20px;
+  width: calc(100% - 80px);
+  background-color: var(--color-dark);
+}
+/* Asegurar que el banner sea visible inmediatamente */
+.banner {
+  margin-top: 0;
+}
+
+/* Estructura base */
+body {
+  font-family: "Courier New", Courier, monospace;
+  background-color: #f5f5f5;
+}
+
+/* Barra lateral - Color principal */
+.bg-light {
+  background-color: var(--color-1) !important;
+  border-right: 3px solid var(--color-3);
+}
+
+/* Iconos de la barra lateral */
+.nav-pills .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0.8rem 0;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-pills .nav-link:hover {
+  background-color: var(--color-3);
+  transform: translateX(5px);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.nav-pills .nav-link.active {
+  background-color: var(--color-5);
+  color: white;
+  border-color: var(--color-5);
+  box-shadow: 0 4px 12px rgba(240, 114, 65, 0.4);
+}
+
+/* Contenido principal */
+.min-vh-100 {
+  background-color: white;
+  border-left: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Banner principal - Combinación de colores */
+.banner {
+  background: var(--color-1);
+  color: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(72, 0, 72, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.banner::after {
+  content: "";
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 150px;
+  height: 150px;
+  background: var(--color-1);
+  opacity: 0.15;
+  z-index: 0;
+}
+
+/* Títulos de sección */
+.section-title {
+  color: var(--color-5);
+  position: relative;
+  padding-bottom: 0.5rem;
+  display: inline-block;
+  font-weight: 700;
+}
+
+.section-title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, var(--color-4), var(--color-5));
+  border-radius: 2px;
+}
+
+#main-content {
+  background-color: #eba64c;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.rank {
+  display: flex;
+  gap: 15px; /* Espacio entre imágenes */
+  padding: 10px 0;
+  overflow-x: auto;
+}
+
+.btn-start {
+  background-color: var(--color-4);
+  color: white;
+  padding: 12px 30px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 50px;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+.btn-start:hover {
+  background-color: #caf041;
+  transform: scale(1.05);
+}
+
+.ranking {
+  background-color: var(--color-3);
+}
+
+.form-select {
+  background-color: var(--color-3);
+}
