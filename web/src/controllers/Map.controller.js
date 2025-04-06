@@ -1,6 +1,9 @@
 import Ship from "../models/Ship.model.js";
+import { send_data } from "../services/GameScoreManager.service.js";
 import Gemini from "../services/Gemini.service.js";
 import { getBoardSize } from "./helpers/helpers.mjs";
+import ScoreCalculator from "./ScoreCalculator.controller.js";
+import { winner } from "./Winner.controller.js";
 
 export async function init() {
   const container = document.querySelector("#main");
@@ -21,6 +24,7 @@ let SHIPS_CONFIG = [
   { size: 2, name: "submarine", id: "submarine2" },
 ];
 
+let scoreCalculator;
 let currentTurn;
 let orientation;
 let playerBoard;
@@ -215,21 +219,54 @@ function handleAttack(cell, board, ships, isPlayerTurn) {
     if (!cell.classList.contains("ship")) {
       cell.classList.add("ship");
     }
-    if (checkWin(ships, isPlayerTurn ? "¡Ganaste!" : "¡Perdiste!")) return; // If a hit occurs, the current player continues their turn
+    scoreCalculator.recordHit(); // Registrar acierto
+    if (checkWin(ships, isPlayerTurn ? "¡Ganaste!" : "¡Perdiste!")) return;
     if (!isPlayerTurn) {
-      setTimeout(machineTurn, 1500); // AI continues if it hits
-    } // Player continues their turn if they hit (no turn change here)
+      setTimeout(machineTurn, 1500);
+    }
   } else {
     cell.classList.add("miss");
     cell.textContent = "💣";
     currentTurn = isPlayerTurn ? "machine" : "player";
+
+    // Lógica para verificar si el fallo estuvo adyacente a un barco enemigo
+    if (isPlayerTurn) {
+      const isNearMiss = checkNearMiss(row, col, machineShips);
+      if (isNearMiss) {
+        scoreCalculator.recordNearMiss(); // Registrar fallo cercano
+      } else {
+        scoreCalculator.recordMiss(); // Registrar fallo normal
+      }
+    }
+
     if (currentTurn === "machine") {
       disableMachineBoard();
-      setTimeout(machineTurn, 1500); // AI's turn after player's miss
+      setTimeout(machineTurn, 1500);
     } else if (currentTurn === "player") {
-      enableMachineBoard(); // Player's turn after AI's miss
+      enableMachineBoard();
     }
   }
+}
+
+// Nueva función para verificar si un disparo fallido estuvo cerca de un barco enemigo
+function checkNearMiss(missedRow, missedCol, enemyShips) {
+  for (const ship of enemyShips) {
+    for (const position of ship.positions) {
+      const shipRow = position.row;
+      const shipCol = position.col;
+
+      // Verificar adyacencia a la redonda (incluyendo diagonales)
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          if (i === 0 && j === 0) continue; // No verificar la misma celda
+          if (missedRow + i === shipRow && missedCol + j === shipCol) {
+            return true; // El fallo estuvo adyacente a un barco
+          }
+        }
+      }
+    }
+  }
+  return false; // No se encontró adyacencia a ningún barco
 }
 
 function getPlayerBoardMatrix() {
@@ -299,10 +336,16 @@ async function machineTurn() {
   }
 }
 
-function checkWin(ships, message) {
+async function checkWin(ships, message) {
   const allSunk = ships.every((ship) => ship.isSunk());
   if (allSunk) {
-    showToast(message);
+    const finalScore = scoreCalculator.getTotalScore();
+    winner();
+    const user = JSON.parse(localStorage.getItem("user_nbai"));
+    user.score += finalScore;
+    const data = { nick_name: user.nickname, score: parseInt(user.score, 10), country_code: user.country.code };
+    // Send info to backend
+    await send_data(`${URL_API}/score-recorder`, data);
     currentTurn = null; // Game over
     disableMachineBoard();
     return true;
@@ -346,6 +389,7 @@ function handleExportPlayerMap() {
 function load_maps() {
   getBoardSize((size) => {
     BOARD_SIZE = size; // Load Maps
+    scoreCalculator = new ScoreCalculator();
 
     currentTurn = null;
     orientation = "horizontal";
