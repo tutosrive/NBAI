@@ -15,133 +15,119 @@
     <link rel="stylesheet" href="../../assets/css/Home.css">
 </head>
 <body>
-    <div class="container-fluid p-0">
-        <div class="row flex-nowrap">
-          
-            <!-- main del home -->
-            <div class="main-content">
-                <!-- contenedor de descripción del juego -->
-                <section class="banner mb-4">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h1 class="mb-3">
-                                N A V A L - B A T T L E
-                            </h1>
-                            <p class="lead">
-                                Rule the seas in an intense strategic duel: position your ships cleverly, strike with precision, and defeat the ruthless AI in this epic one-on-one naval battle.
-                            </p>
-                            <!--botón de iniciar juego-->
-                            <button class="btn btn-start">
-                                <i class="fas fa-play me-2"></i> S T A R T
-                            </button>
-                        </div>
+    <!-- main del home -->
+    <div class="main-content">
+        <!-- contenedor de descripción del juego -->
+        <section class="banner mb-2">
+            <div class="row align-items-center">
+                <div class="col-9 banner-text">
+                    <div class="col-12">
+                        <h1 class="title mb-1">
+                            N A V A L - B A T T L E
+                        </h1>
+                        <p class="lead">
+                            Rule the seas in an intense strategic duel: position your ships cleverly, strike with precision, and defeat the ruthless AI in this epic one-on-one naval battle.
+                        </p>
+                        <!--botón de iniciar juego-->
+                        <button class="btn btn-start">
+                            <i class="fas fa-play me-2"></i>▶ S T A R T
+                        </button>
                     </div>
-                </section>
+                </div>
+            </div>
+        </section>
 
-                <!-- contenedor de mapas de juego-->
-                <h2 id="images" class="section-title mb-4">Choose your map</h2>
-                <section class="carrusel mb-2">
-                    <div class="row">
-                        <div class="col">
-                            <div class="d-flex overflow-auto">
-                                <!-- seleccionar mapas con checkbox -->
-                                <label class="image-checkbox">
-                                    <input type="checkbox" name="map" value="AbyssofShadows" class="d-none">
-                                    <img src="../Resources/AbyssofShadows.jpg" class="carrusel-img">
-                                </label>
-                                <label class="image-checkbox">
-                                    <input type="checkbox" name="map" value="BayofSilence" class="d-none">
-                                    <img src="../Resources/BayofSilence.jpg" class="carrusel-img">
-                                </label>
-                                <label class="image-checkbox">
-                                    <input type="checkbox" name="map" value="CoastofShipwrecks" class="d-none">
-                                    <img src="../Resources/CoastofShipwrecks.jpg" class="carrusel-img">
-                                </label>
-                                <label class="image-checkbox">
-                                    <input type="checkbox" name="map" value="KrakensStorm" class="d-none">
-                                    <img src="../Resources/KrakensStorm.jpg" class="carrusel-img">
-                                </label>
-                                <label class="image-checkbox">
-                                    <input type="checkbox" name="map" value="SeaofMirages" class="d-none">
-                                    <img src="../Resources/SeaofMirages.jpg" class="carrusel-img">
-                                </label>
+        <!-- contenedor de mapas de juego-->
+        <h2 id="images" class="section-title mb-4">Choose your map</h2>
+        <section class="carrusel mb-3">
+            <div class="row">
+                <div class="map d-flex overflow-auto">
+                    <!-- seleccionar mapas con checkbox -->
+                    <label class="image-checkbox">
+                        <input type="checkbox" name="map" value="AbyssofShadows" class="d-none">
+                        <img src="../Resources/AbyssofShadows.jpg" class="carrusel-img">
+                    </label>
+                    <label class="image-checkbox">
+                        <input type="checkbox" name="map" value="BayofSilence" class="d-none">
+                        <img src="../Resources/BayofSilence.jpg" class="carrusel-img">
+                    </label>
+                    <label class="image-checkbox">
+                        <input type="checkbox" name="map" value="CoastofShipwrecks" class="d-none">
+                        <img src="../Resources/CoastofShipwrecks.jpg" class="carrusel-img">
+                    </label>
+                    <label class="image-checkbox">
+                        <input type="checkbox" name="map" value="KrakensStorm" class="d-none">
+                        <img src="../Resources/KrakensStorm.jpg" class="carrusel-img">
+                    </label>
+                    <label class="image-checkbox">
+                        <input type="checkbox" name="map" value="SeaofMirages" class="d-none">
+                        <img src="../Resources/SeaofMirages.jpg" class="carrusel-img">
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- contenedor de rangos y tableros -->
+        <div class="boards">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-6">
+                    <h2 id="ranks" class="section-title mb-3">Choose your rank</h2>
+                    <section class="rank">
+                        <label class="image-checkbox1">
+                            <input type="checkbox" name="rank" value="Cadet" class="d-none">
+                            <div class="image-container">
+                              <img src="../Resources/Cadet.jpg" class="carrusel-img">
+                              <span class="rank-label">Cadet</span>
                             </div>
-                        </div>
-                    </div>
-                </section>
+                          </label>
+                        <label class="image-checkbox1">
+                            <input type="checkbox" name="rank" value="Seafarer" class="d-none">
+                            <div class="image-container">
+                                <img src="../Resources/Seafarer.jpg" class="carrusel-img">
+                                <span class="rank-label">Seafarer</span>
+                            </div>
+                        </label>
+                        <label class="image-checkbox1">
+                            <input type="checkbox" name="rank" value="Commander" class="d-none">
+                            <div class="image-container">
+                                <img src="../Resources/Commander.jpg" class="carrusel-img">
+                                <span class="rank-label">Commander</span>
+                            </div>
+                        </label>
+                        <label class="image-checkbox1">
+                            <input type="checkbox" name="rank" value="Captain" class="d-none">
+                            <div class="image-container">
+                                <img src="../Resources/Captain.jpg" class="carrusel-img">
+                                <span class="rank-label">Captain</span>
+                            </div>
+                        </label>
+                        <label class="image-checkbox1">
+                            <input type="checkbox" name="rank" value="Admiral" class="d-none">
+                            <div class="image-container mb-2">
+                                <img src="../Resources/Admiral.jpg" class="carrusel-img">
+                                <span class="rank-label">Admiral</span>
+                            </div>
+                        </label>
+                    </section>
 
-                <!-- contenedor de rangos y tableros -->
-                <div class="boards">
-                    <div class="row">
-                        <div class="col-6">
-                            <h2 id="ranks" class="section-title mb-4">Choose your rank</h2>
-                            <section class="rank mb-2">
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="d-flex overflow-auto mb-2">
-                                            <!-- selección de rangos con checkbox -->
-                                            <label class="image-checkbox1">
-                                                <input type="checkbox" name="rank" value="Cadet" class="d-none">
-                                                <div class="image-container">
-                                                  <img src="../Resources/Cadet.jpg" class="carrusel-img">
-                                                  <span class="rank-label">Cadet</span>
-                                                </div>
-                                              </label>
-                                            <label class="image-checkbox1">
-                                                <input type="checkbox" name="rank" value="Seafarer" class="d-none">
-                                                <div class="image-container">
-                                                    <img src="../Resources/Seafarer.jpg" class="carrusel-img">
-                                                    <span class="rank-label">Seafarer</span>
-                                                </div>
-                                            </label>
-                                            <label class="image-checkbox1">
-                                                <input type="checkbox" name="rank" value="Commander" class="d-none">
-                                                <div class="image-container">
-                                                    <img src="../Resources/Commander.jpg" class="carrusel-img">
-                                                    <span class="rank-label">Commander</span>
-                                                </div>
-                                            </label>
-                                            <label class="image-checkbox1">
-                                                <input type="checkbox" name="rank" value="Captain" class="d-none">
-                                                <div class="image-container">
-                                                    <img src="../Resources/Captain.jpg" class="carrusel-img">
-                                                    <span class="rank-label">Captain</span>
-                                                </div>
-                                            </label>
-                                            <label class="image-checkbox1">
-                                                <input type="checkbox" name="rank" value="Admiral" class="d-none">
-                                                <div class="image-container mb-2">
-                                                    <img src="../Resources/Admiral.jpg" class="carrusel-img">
-                                                    <span class="rank-label">Admiral</span>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <!--seleccionar el tamaño del tablero-->
-                            <h2 id="board-choose" class="section-title mb-3">Choose your board size</h2>
-                            <section class="board-choose mb-4">
-                                <div class="row">
-                                    <div class="col">
-                                        <select class="form-select" id="board" name="board"></select>
-                                    </div>
-                                </div>
-                            </section>
+                    <!--seleccionar el tamaño del tablero-->
+                    <h2 id="board-choose" class="section-title mb-3">Choose your board size</h2>
+                    <section class="board-choose">
+                        <div class="row">                           
+                            <select class="form-select" id="board" name="board"></select>                            
                         </div>
+                    </section>
+                </div>
 
-                        <!-- contenedor de ranking -->
-                        <div class="col-6">
-                            <h2 id="ranking" class="section-title mb-4">Ranking</h2>
-                            <section class="ranking">
-                        </div>
-                    </div>
+                <!-- contenedor de ranking -->
+                <div class="col-sm-12 col-md-12 col-lg-6">
+                    <h2 id="ranking" class="section-title mb-4">Ranking</h2>
+                    <section class="ranking">
                 </div>
             </div>
         </div>
     </div>
-
+        
     <!-- Cargar Bootstrap JS y el js de la página -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../controllers/Home.controller.js"></script>
