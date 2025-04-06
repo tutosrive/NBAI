@@ -1,73 +1,86 @@
-import Ship from '../models/Ship.model.js';
+import Ship from "../models/Ship.model.js";
+import Gemini from "../services/Gemini.service.js";
+import { getBoardSize } from "./helpers/helpers.mjs";
 
 export async function init() {
-  const container = document.querySelector('#main');
-  const res = await fetch('./html/Map.html');
+  const container = document.querySelector("#main");
+  const res = await fetch("./html/Map.html");
   const html = await res.text();
+  console.log(html);
   container.innerHTML = html;
   load_maps();
 }
-console.log(new Ship(9));
 
-let BOARD_SIZE = 10; // cambiar para que sea configurable
-let SHIPS;
+let BOARD_SIZE; // Tamaño por defecto, configurable entre 10 y 20
+let SHIPS_CONFIG = [
+  { size: 5, name: "aircraft carrier", id: "carrier" },
+  { size: 4, name: "battleship", id: "battleship" },
+  { size: 3, name: "cruiser", id: "cruiser1" },
+  { size: 3, name: "cruiser", id: "cruiser2" },
+  { size: 2, name: "submarine", id: "submarine1" },
+  { size: 2, name: "submarine", id: "submarine2" },
+];
 
 let currentTurn;
 let orientation;
 let playerBoard;
 let machineBoard;
 let orientationBtn;
+let shipInfoPanel; // Panel to display ship info
+let aiMessageToast;
+let aiMessageToastBody;
 
 let playerShips = [];
 let machineShips = [];
+let shipIndex = 0; // Index of the ship being placed by the player
+let aiPreviousTargets = []; // Inicializa el array para almacenar los objetivos de la IA
 
-function load_maps() {
-  BOARD_SIZE = 10;
-  SHIPS = [new Ship(5, 'Aircraft Carrier'), new Ship(4, 'Battleship'), new Ship(3, 'Cruiser'), new Ship(3, 'Cruiser'), new Ship(2, 'Submarine'), new Ship(2, 'Submarine')];
-  currentTurn = 'player';
-  orientation = 'horizontal';
+function showToast(message) {
+  aiMessageToastBody.innerHTML = `<strong>${message}</strong>`;
+  aiMessageToast.classList.add("show"); // Crear y añadir el backdrop usando las clases de Bootstrap
 
-  playerBoard = document.querySelector('#player-board');
-  machineBoard = document.querySelector('#machine-board');
-  orientationBtn = document.querySelector('#orientation-button');
+  const backdrop = document.createElement("div");
+  backdrop.classList.add("modal-backdrop", "fade", "show"); // Clases de Bootstrap para el backdrop
+  document.body.appendChild(backdrop);
 
-  playerShips = [];
-  machineShips = [];
+  let timeout = setTimeout(() => {
+    aiMessageToast.classList.remove("show"); // Remover el backdrop
 
-  orientationBtn.addEventListener('click', () => {
-    orientation = orientation === 'horizontal' ? 'vertical' : 'horizontal';
-    orientationBtn.textContent = `Cambiar Orientación (${orientation.charAt(0).toUpperCase() + orientation.slice(1)})`;
-  });
-  const toggleBtn = document.querySelector('#toggle-debug');
-  let debugMode = false;
-
-  toggleBtn.addEventListener('click', () => {
-    debugMode = !debugMode;
-    const shipCells = machineBoard.querySelectorAll('.ship');
-    shipCells.forEach((cell) => {
-      cell.style.backgroundColor = debugMode ? '#b446b4' : '#87cefa';
-    });
-  });
-
-  createBoard(playerBoard, true);
-  createBoard(machineBoard, false);
+    if (backdrop && backdrop.parentNode) {
+      backdrop.parentNode.removeChild(backdrop);
+    }
+    timeout = null;
+  }, 3000);
 }
 
 function createBoard(container, isPlayer) {
-  container.innerHTML = '';
-  for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
-    const cell = document.createElement('div');
-    cell.classList.add('cell');
-    cell.dataset.index = i;
-    if (!isPlayer) {
-      cell.addEventListener('click', () => {
-        if (currentTurn !== 'player' || cell.classList.contains('hit') || cell.classList.contains('miss')) return;
-        handleAttack(cell, machineBoard, machineShips, true);
-      });
-    } else {
-      cell.addEventListener('click', () => placePlayerShip(cell));
+  container.innerHTML = "";
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    const rowDiv = document.createElement("div");
+    rowDiv.dataset.row = i;
+    rowDiv.style.display = "flex";
+    rowDiv.style.gap = "2px";
+
+    for (let j = 0; j < BOARD_SIZE; j++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      cell.dataset.row = i;
+      cell.dataset.col = j;
+      const index = i * BOARD_SIZE + j;
+      cell.dataset.index = index;
+
+      if (!isPlayer) {
+        cell.addEventListener("click", () => {
+          if (currentTurn !== "player" || cell.classList.contains("hit") || cell.classList.contains("miss")) return;
+          handleAttack(cell, machineBoard, machineShips, true);
+        });
+        cell.classList.add("machine-cell");
+      } else {
+        cell.addEventListener("click", () => placePlayerShip(cell));
+      }
+      rowDiv.appendChild(cell);
     }
-    container.appendChild(cell);
+    container.appendChild(rowDiv);
   }
 }
 
@@ -79,79 +92,107 @@ function coordToIndex(row, col) {
   return row * BOARD_SIZE + col;
 }
 
-function canPlaceShip(board, row, col, size, orientation) {
-  if (orientation === 'horizontal' && col + size > BOARD_SIZE) return false;
-  if (orientation === 'vertical' && row + size > BOARD_SIZE) return false;
+function canPlaceShipPreview(board, startRow, startCol, size, orientation) {
+  if (orientation === "horizontal" && startCol + size > BOARD_SIZE) return false;
+  if (orientation === "vertical" && startRow + size > BOARD_SIZE) return false;
 
   for (let i = 0; i < size; i++) {
-    const r = orientation === 'horizontal' ? row : row + i;
-    const c = orientation === 'horizontal' ? col + i : col;
-    const cell = board.children[coordToIndex(r, c)];
-    if (cell.classList.contains('ship')) return false;
+    const r = orientation === "horizontal" ? startRow : startRow + i;
+    const c = orientation === "horizontal" ? startCol + i : startCol;
+    if (r >= BOARD_SIZE || c >= BOARD_SIZE) return false; // Boundary check
+    const cell = board.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+    if (cell && cell.classList.contains("ship")) return false;
   }
-
   return true;
 }
 
-function placeShip(board, row, col, size, shipList, isPlayer = false) {
+function placeShip(board, row, col, ship, shipList, isPlayer = false) {
   const positions = [];
-  for (let i = 0; i < size; i++) {
-    const r = orientation === 'horizontal' ? row : row + i;
-    const c = orientation === 'horizontal' ? col + i : col;
-    const index = coordToIndex(r, c);
-    const cell = board.children[index];
+  for (let i = 0; i < ship.size; i++) {
+    const r = orientation === "horizontal" ? row : row + i;
+    const c = orientation === "horizontal" ? col + i : col;
+    const cell = board.querySelector(`[data-row="${r}"][data-col="${c}"]`);
 
-    // Agregar clase 'ship' tanto a jugador como máquina
-    cell.classList.add('ship');
-
-    positions.push(index);
+    if (cell) {
+      cell.classList.add("ship");
+      positions.push({ row: r, col: c });
+    }
   }
-  shipList.push({ positions, hits: [] });
+  ship.setPositions(positions);
+  shipList.push(ship);
 }
 
-let shipIndex = 0;
-function placePlayerShip(cell) {
-  if (shipIndex >= SHIPS.length) return;
-  const { row, col } = indexToCoord(parseInt(cell.dataset.index));
-  const size = SHIPS[shipIndex].size;
+function updateShipInfoPanel() {
+  if (shipIndex < SHIPS_CONFIG.length) {
+    const currentShip = SHIPS_CONFIG[shipIndex];
+    shipInfoPanel.innerHTML = `<span class="badge text-bg-warning">Placing: ${currentShip.name}</span> <span class="badge text-bg-info">Size: ${currentShip.size}</span>`;
+  } else {
+    shipInfoPanel.classList.add("bg-succes");
+    shipInfoPanel.textContent = "All ships placed!";
+    shipInfoPanel.classList.add("visually-hidden");
+  }
+}
 
-  if (canPlaceShip(playerBoard, row, col, size, orientation)) {
-    placeShip(playerBoard, row, col, size, playerShips, true);
+function placePlayerShip(cell) {
+  if (shipIndex >= SHIPS_CONFIG.length) return;
+  const row = parseInt(cell.dataset.row);
+  const col = parseInt(cell.dataset.col);
+  const config = SHIPS_CONFIG[shipIndex];
+  const ship = new Ship(config.id, config.size, config.name);
+
+  if (canPlaceShipPreview(playerBoard, row, col, ship.size, orientation)) {
+    // Corrección aquí
+    placeShip(playerBoard, row, col, ship, playerShips, true);
     shipIndex++;
-    if (shipIndex === SHIPS.length) {
+    updateShipInfoPanel();
+    if (shipIndex === SHIPS_CONFIG.length) {
       createMachineShips();
       enableMachineBoard();
+      currentTurn = "player"; // Start the game with the player's turn // Remove preview event listeners after all ships are placed
+      playerBoard.removeEventListener("mouseover", showShipPreview);
+      playerBoard.removeEventListener("mouseout", clearShipPreview); // Eliminar explícitamente la clase 'preview' de todas las celdas
+
+      const allCells = playerBoard.querySelectorAll(".cell");
+      allCells.forEach((cell) => cell.classList.remove("preview"));
     }
   }
 }
 
 function createMachineShips() {
-  SHIPS.forEach((ship) => {
+  for (const config of SHIPS_CONFIG) {
+    const ship = new Ship(config.id, config.size, config.name);
     let placed = false;
     while (!placed) {
-      const orient = Math.random() < 0.5 ? 'horizontal' : 'vertical';
+      const orient = Math.random() < 0.5 ? "horizontal" : "vertical";
       const row = Math.floor(Math.random() * BOARD_SIZE);
       const col = Math.floor(Math.random() * BOARD_SIZE);
-      if (canPlaceShip(machineBoard, row, col, ship.size, orient)) {
-        const original = orientation;
-        orientation = orient;
-        placeShip(machineBoard, row, col, ship.size, machineShips);
-        orientation = original;
+      const originalOrientation = orientation;
+      orientation = orient;
+      if (canPlaceShipPreview(machineBoard, row, col, ship.size, orientation)) {
+        // Corrección aquí
+        placeShip(machineBoard, row, col, ship, machineShips);
+        orientation = originalOrientation;
         placed = true;
       }
     }
-  });
+  }
 }
 
 function enableMachineBoard() {
-  const cells = machineBoard.querySelectorAll('.cell');
-  cells.forEach((cell) => cell.classList.add('enabled'));
+  const cells = machineBoard.querySelectorAll(".machine-cell");
+  cells.forEach((cell) => cell.classList.add("enabled"));
+}
+
+function disableMachineBoard() {
+  const cells = machineBoard.querySelectorAll(".machine-cell");
+  cells.forEach((cell) => cell.classList.remove("enabled"));
 }
 
 function registerHit(row, col, ships) {
-  for (let ship of ships) {
-    if (ship.positions.includes(coordToIndex(row, col))) {
-      ship.hits.push(coordToIndex(row, col));
+  for (const ship of ships) {
+    const hitPosition = ship.positions.find((pos) => pos.row === row && pos.col === col);
+    if (hitPosition) {
+      ship.hit();
       return true;
     }
   }
@@ -159,44 +200,243 @@ function registerHit(row, col, ships) {
 }
 
 function handleAttack(cell, board, ships, isPlayerTurn) {
-  const index = parseInt(cell.dataset.index);
-  const { row, col } = indexToCoord(index);
+  if (isPlayerTurn && currentTurn !== "player") return;
+  if (!isPlayerTurn && currentTurn !== "machine") return;
+
+  const row = parseInt(cell.dataset.row);
+  const col = parseInt(cell.dataset.col);
+  if (cell.classList.contains("hit") || cell.classList.contains("miss")) return;
+
   const wasHit = registerHit(row, col, ships);
 
   if (wasHit) {
-    cell.classList.add('hit');
-    cell.textContent = '❌';
-    if (!cell.classList.contains('ship')) {
-      cell.classList.add('ship');
+    cell.classList.add("hit");
+    cell.textContent = "❌";
+    if (!cell.classList.contains("ship")) {
+      cell.classList.add("ship");
     }
-    if (checkWin(ships, isPlayerTurn ? '¡Ganaste!' : '¡Perdiste!')) return;
+    if (checkWin(ships, isPlayerTurn ? "¡Ganaste!" : "¡Perdiste!")) return; // If a hit occurs, the current player continues their turn
     if (!isPlayerTurn) {
-      setTimeout(machineTurn, 600);
-    }
+      setTimeout(machineTurn, 1500); // AI continues if it hits
+    } // Player continues their turn if they hit (no turn change here)
   } else {
-    cell.classList.add('miss');
-    cell.textContent = '💣';
-    currentTurn = isPlayerTurn ? 'machine' : 'player';
-    if (currentTurn === 'machine') {
-      setTimeout(machineTurn, 600);
+    cell.classList.add("miss");
+    cell.textContent = "💣";
+    currentTurn = isPlayerTurn ? "machine" : "player";
+    if (currentTurn === "machine") {
+      disableMachineBoard();
+      setTimeout(machineTurn, 1500); // AI's turn after player's miss
+    } else if (currentTurn === "player") {
+      enableMachineBoard(); // Player's turn after AI's miss
     }
   }
 }
 
-function machineTurn() {
-  const available = [...playerBoard.querySelectorAll('.cell')].filter((c) => !c.classList.contains('hit') && !c.classList.contains('miss'));
+function getPlayerBoardMatrix() {
+  const matrix = Array(BOARD_SIZE)
+    .fill(null)
+    .map(() => Array(BOARD_SIZE).fill(0));
+  const cells = playerBoard.querySelectorAll(".cell");
+  cells.forEach((cell) => {
+    const row = parseInt(cell.dataset.row);
+    const col = parseInt(cell.dataset.col);
+    if (cell.classList.contains("hit")) {
+      matrix[row][col] = 1; // Hit ship
+    } else if (cell.classList.contains("miss")) {
+      matrix[row][col] = -1; // Missed shot
+    } // 0 represents untouched cells
+  });
+  return matrix;
+}
 
-  if (available.length === 0) return;
+async function machineTurn() {
+  if (currentTurn !== "machine") return; // Simulate AI thinking
 
-  const cell = available[Math.floor(Math.random() * available.length)];
-  handleAttack(cell, playerBoard, playerShips, false);
+  const thinkingDelay = Math.random() * 2000 + 1000; // 1 to 3 seconds
+  showToast("AI is thinking...");
+  console.log("AI is thinking...");
+  await new Promise((resolve) => setTimeout(resolve, thinkingDelay));
+
+  const playerMatrix = getPlayerBoardMatrix();
+  console.log("Player Board Matrix:", playerMatrix); // Added this line
+  const geminiResponse = await Gemini.init(playerMatrix, aiPreviousTargets); // Pasa aiPreviousTargets
+
+  if (geminiResponse.status === 200 && geminiResponse.data?.position) {
+    const [row, col] = geminiResponse.data.position;
+    aiPreviousTargets.push([row, col]); // Añade la nueva posición a la lista de atacadas
+
+    const message = geminiResponse.data?.message || "AI's turn!";
+    showToast(`AI says: ${message}`);
+
+    const cell = playerBoard.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+    if (cell && !cell.classList.contains("hit") && !cell.classList.contains("miss")) {
+      handleAttack(cell, playerBoard, playerShips, false); // If AI hits, handleAttack will call machineTurn again
+    } else {
+      // Fallback to random if Gemini suggests an invalid or already targeted cell
+      console.warn("Gemini suggested an invalid target, falling back to random.");
+      const available = [...playerBoard.querySelectorAll(".cell")].filter((c) => !c.classList.contains("hit") && !c.classList.contains("miss"));
+      if (available.length > 0) {
+        const randomCell = available[Math.floor(Math.random() * available.length)];
+        handleAttack(randomCell, playerBoard, playerShips, false); // If AI hits, handleAttack will call machineTurn again
+      } else {
+        console.warn("No available cells for AI to attack.");
+        currentTurn = "player";
+        enableMachineBoard();
+      }
+    }
+  } else {
+    console.error("Gemini API error:", geminiResponse);
+    showToast("AI encountered an error!"); // Fallback to random if Gemini API fails
+    const available = [...playerBoard.querySelectorAll(".cell")].filter((c) => !c.classList.contains("hit") && !c.classList.contains("miss"));
+    if (available.length > 0) {
+      const cell = available[Math.floor(Math.random() * available.length)];
+      handleAttack(cell, playerBoard, playerShips, false); // If AI hits, handleAttack will call machineTurn again
+    } else {
+      console.warn("No available cells for AI to attack (Gemini error).");
+      currentTurn = "player";
+      enableMachineBoard();
+    }
+  }
 }
 
 function checkWin(ships, message) {
-  const allSunk = ships.every((ship) => ship.hits.length === ship.positions.length);
+  const allSunk = ships.every((ship) => ship.isSunk());
   if (allSunk) {
-    alert(message);
+    showToast(message);
+    currentTurn = null; // Game over
+    disableMachineBoard();
     return true;
   }
   return false;
+}
+
+function exportPlayerMap() {
+  const boardSize = BOARD_SIZE; // Utiliza la variable global BOARD_SIZE
+  const playerBoardElement = document.querySelector("#player-board");
+  const rows = playerBoardElement.querySelectorAll(".board > div");
+  const mapMatrix = Array(boardSize)
+    .fill(null)
+    .map(() => Array(boardSize));
+
+  rows.forEach((row, rowIndex) => {
+    const cells = row.querySelectorAll(".cell");
+    cells.forEach((cell, colIndex) => {
+      if (cell.classList.contains("hit") && cell.classList.contains("ship")) {
+        mapMatrix[rowIndex][colIndex] = "p1-h";
+      } else if (cell.classList.contains("ship")) {
+        mapMatrix[rowIndex][colIndex] = "p1";
+      } else if (cell.classList.contains("miss")) {
+        mapMatrix[rowIndex][colIndex] = "b";
+      } else {
+        mapMatrix[rowIndex][colIndex] = "a";
+      }
+    });
+  });
+
+  return mapMatrix;
+}
+
+function handleExportPlayerMap() {
+  const exportedMap = exportPlayerMap();
+  console.log("Mapa del Jugador Exportado (Matriz):");
+  console.log(exportedMap);
+  showToast("Mapa del Jugador Exportado a la consola como matriz"); // Opcional: mostrar un mensaje al usuario
+}
+
+function load_maps() {
+  getBoardSize((size) => {
+    BOARD_SIZE = size; // Load Maps
+
+    currentTurn = null;
+    orientation = "horizontal";
+
+    playerBoard = document.querySelector("#player-board");
+    machineBoard = document.querySelector("#machine-board");
+    orientationBtn = document.querySelector("#orientation-button");
+    shipInfoPanel = document.querySelector("#div-info-some");
+    shipInfoPanel.classList.remove("visually-hidden");
+    aiMessageToast = document.querySelector("#ai-message-toast");
+    aiMessageToastBody = document.querySelector("#ai-message-toast-body");
+
+    playerShips = [];
+    machineShips = [];
+    shipIndex = 0;
+    updateShipInfoPanel();
+    disableMachineBoard();
+    aiPreviousTargets = [];
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key.toUpperCase() === "R") {
+        orientation = orientation === "horizontal" ? "vertical" : "horizontal";
+        orientationBtn.textContent = `Ship to ${orientation.charAt(0).toUpperCase() + orientation.slice(1)}`;
+      }
+    });
+
+    orientationBtn.addEventListener("click", () => {
+      orientation = orientation === "horizontal" ? "vertical" : "horizontal";
+      orientationBtn.textContent = `Ship to ${orientation.charAt(0).toUpperCase() + orientation.slice(1)}`;
+    });
+
+    const boardsContainer = document.querySelector(".boards"); // row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-2
+    boardsContainer.classList.add("row-cols-1", "row-cols-sm-2", "row-cols-md-2", "row-cols-lg-2"); // }
+    createBoard(playerBoard, true);
+    createBoard(machineBoard, false);
+
+    const exportButton = document.querySelector("#export-player-map");
+    if (exportButton) {
+      exportButton.addEventListener("click", handleExportPlayerMap);
+    } // Event listeners for ship preview
+
+    playerBoard.addEventListener("mouseover", showShipPreview);
+    playerBoard.addEventListener("mouseout", clearShipPreview);
+  });
+}
+
+function showShipPreview(event) {
+  if (shipIndex >= SHIPS_CONFIG.length) return;
+  const cell = event.target;
+  if (!cell.classList.contains("cell") || cell.classList.contains("ship")) return;
+
+  const row = parseInt(cell.dataset.row);
+  const col = parseInt(cell.dataset.col);
+  const currentShipSize = SHIPS_CONFIG[shipIndex].size;
+
+  const canBePlaced = canPlaceShipPreview(playerBoard, row, col, currentShipSize, orientation);
+
+  for (let i = 0; i < currentShipSize; i++) {
+    const r = orientation === "horizontal" ? row : row + i;
+    const c = orientation === "horizontal" ? col + i : col;
+
+    if (r < BOARD_SIZE && c < BOARD_SIZE) {
+      const previewCell = playerBoard.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+      if (previewCell) {
+        previewCell.classList.remove("preview-invalid"); // Remove previous invalid class
+        previewCell.classList.remove("preview"); // Remove previous valid class
+        if (canBePlaced) {
+          previewCell.classList.add("preview");
+        } else {
+          previewCell.classList.add("preview-invalid");
+        }
+      }
+    }
+  } // If the ship cannot be placed from the initial hover cell, also mark subsequent out-of-bounds cells as invalid
+  if (!canBePlaced) {
+    for (let i = 0; i < currentShipSize; i++) {
+      const r = orientation === "horizontal" ? row : row + i;
+      const c = orientation === "horizontal" ? col + i : col;
+      if (r >= BOARD_SIZE || c >= BOARD_SIZE) {
+        const previewCell = playerBoard.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+        if (previewCell) {
+          previewCell.classList.add("preview-invalid");
+        }
+      }
+    }
+  }
+}
+
+function clearShipPreview() {
+  const previewCells = playerBoard.querySelectorAll(".preview");
+  previewCells.forEach((cell) => cell.classList.remove("preview"));
+  const invalidPreviewCells = playerBoard.querySelectorAll(".preview-invalid");
+  invalidPreviewCells.forEach((cell) => cell.classList.remove("preview-invalid"));
 }
