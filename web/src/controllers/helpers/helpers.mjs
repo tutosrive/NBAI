@@ -6,14 +6,14 @@
 export async function fetch_JSON(url, config = {}) {
   if (config) {
     // Validate type config === {key:value}
-    if (!(config instanceof Object) && !Array.isArray(config) && !config) throw new Error('La configuración debe ser un objeto {key: value}');
+    if (!(config instanceof Object) && !Array.isArray(config) && !config) throw new Error("La configuración debe ser un objeto {key: value}");
     // Validate that have a body
-    if (config.method === 'POST' && !config.body) throw new Error('Asegurarse de enviar un BODY si método es POST');
+    if (config.method === "POST" && !config.body) throw new Error("Asegurarse de enviar un BODY si método es POST");
     // Cast Javascript Object to StringJSON
     config.body = JSON.stringify(config.body);
   }
-  if (!Object.hasOwn(config, 'headers')) config['headers'] = { Accept: 'application/json' };
-  else config.headers['Accept'] = 'application/json';
+  if (!Object.hasOwn(config, "headers")) config["headers"] = { Accept: "application/json" };
+  else config.headers["Accept"] = "application/json";
   // Try request
   try {
     const request = await fetch(url, config);
@@ -23,7 +23,7 @@ export async function fetch_JSON(url, config = {}) {
     }
     return { status: request.status, data: null };
   } catch (e) {
-    return { status: 500, data: 'Internal Server Error', error: e };
+    return { status: 500, data: "Internal Server Error", error: e };
   }
 }
 
@@ -52,3 +52,32 @@ export async function fetchText(url, container = null) {
 }
 
 export const convert_kelvin_celcius = (kelkin_grades) => (kelkin_grades - 273.15).toFixed(2);
+export async function getBoardSize(callback) {
+  const modalHTML = `
+  <div class="modal fade" id="boardModal" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header justify-content-center"><h5 class="modal-title">Select board size</h5></div>
+        <div class="modal-body text-center justify-content-center">
+          <div class="d-flex justify-content-center"><input type="number" id="sizeInput" class="form-control mb-2 text-center w-50" min="10" max="20" placeholder="Min 10, Max 20" required></div>
+          <p class="text-danger d-none">Minimum value (10), Maximum value (20)!</p>
+        </div>
+        <div class="modal-footer"><button class="btn btn-primary" onclick="handleOk()">Accept</button></div>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML("beforeend", modalHTML);
+  const modal = new bootstrap.Modal("#boardModal");
+  const input = document.getElementById("sizeInput");
+
+  window.handleOk = () => {
+    if (input.checkValidity()) {
+      callback(Number(input.value));
+      modal.hide();
+      document.getElementById("boardModal").remove();
+    } else {
+      document.querySelector(".text-danger").classList.remove("d-none");
+    }
+  };
+  modal.show();
+}
