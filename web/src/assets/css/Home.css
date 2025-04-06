@@ -1,39 +1,31 @@
 :root {
-  --color-1: #212930; 
+  --color-1: #212930;
   --color-2: #4a6070;
   --color-3: #5d8aa8;
   --color-4: #946b2d;
   --color-5: #d4af37;
-  --color-light: #f0f4f8; 
-  --color-dark: #273642; 
+  --color-light: #f0f4f8;
+  --color-dark: #273642;
 }
 
 body {
-  overflow-x: hidden;
-  padding: 0;
+  background-color: var(--color-1);
+  color: var(--color-light);
+  font-family:'Courier New', Courier, monospace;
   margin: 0;
+  padding: 0;
 }
-.sidebar {
-  width: 100px;
-  position: fixed;
-  height: 100vh;
-  z-index: 1000;
-}
+
 .main-content {
-  margin-left: 80px;
   padding: 20px;
-  width: calc(100% - 80px);
+  width: 100%;
   background-color: var(--color-dark);
 }
 
 .banner {
-  margin-top: 20px;
-  padding: 20px;
-}
-
-body {
-  font-family: "Courier New", Courier, monospace;
-  background-color: #f5f5f5;
+  margin-top: 15px;
+  margin-left: 70px;
+  margin-right: 25px;
 }
 
 .min-vh-100 {
@@ -41,10 +33,10 @@ body {
   border-left: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.banner {
+.banner-text {
   background: var(--color-1);
   color: white;
-  padding: 2.5rem;
+  padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(72, 0, 72, 0.15);
   position: relative;
@@ -63,12 +55,32 @@ body {
   z-index: 0;
 }
 
+.title {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.lead {
+  font-size: 18px;
+  color: var(--color-light);
+  margin-top: 10px;
+}
+
+.map {
+  margin-left: 40px;
+}
+
 .section-title {
   color: var(--color-5);
   position: relative;
   padding-bottom: 0.5rem;
   display: inline-block;
-  font-weight: 700;
+  font-size: 25px;
+  font-weight: 800;
+  margin-top: 5px;
+  margin-left: 60px;
+  margin-right: 25px;
+  margin-bottom: 25px;
 }
 
 .section-title::after {
@@ -89,51 +101,24 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-section.carrusel {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin: 0px 0;
-}
-
-section.carrusel div {
-  min-height: 195px;
-  max-height: 270px;
-  background-size: cover;
-  transition-duration: 500ms;
-}
-
-section.carrusel div:hover {
-  transform: scale(1.05);
-  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
-}
-
-@media (max-width: 700px) { 
-  section.carrusel{
-      flex-direction: column;
-      gap: 5px;
-  }
-  section.carrusel div{
-      width: 100%;
-  }
-  section.carrusel div:hover{
-      transform: none;
-      box-shadow: none;
-  }
+.carrusel {
+  margin-left: 15px;
+  margin-right: 15px;
 }
 
 .rank {
   display: flex;
-  gap: 15px; 
-  padding: 10px 0;
+  gap: 15px;
   overflow-x: auto;
+  margin-left: 60px;
+  margin-right: 25px;
 }
 
 .btn-start {
   background-color: var(--color-4);
   color: white;
   padding: 12px 30px;
-  font-size: 1.2rem;
+  font-size: 25px;
   font-weight: bold;
   border-radius: 50px;
   margin-top: 20px;
@@ -150,17 +135,22 @@ section.carrusel div:hover {
 
 .form-select {
   background-color: var(--color-3);
+  margin-top: 15px;
+  margin-left: 25px;
+  margin-right: 25px;
+  margin-bottom: 25px;
 }
 
 .image-checkbox img {
-  border-radius: 12px; 
+  border-radius: 12px;
   min-width: 195px;
   height: 270px;
   object-fit: cover;
 }
 
 .image-checkbox1 {
-  margin: 8px; 
+  margin: 0px;
+  margin-bottom: 0px;
 }
 
 .image-container {
@@ -171,7 +161,7 @@ section.carrusel div:hover {
 }
 
 .image-checkbox1 img {
-  border-radius: 12px; 
+  border-radius: 20px;
   min-width: 100px;
   height: 100px;
   object-fit: cover;
@@ -180,5 +170,10 @@ section.carrusel div:hover {
 .rank-label {
   font-size: 16px;
   color: var(--color-4);
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
+}
+
+#board {
+  width: 50%;
+  margin-left: 70px;
 }
