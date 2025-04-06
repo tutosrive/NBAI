@@ -1,0 +1,81 @@
+/* Estilos principales del pie de página */
+.custom-footer {
+    position: fixed;
+    bottom: 0;      
+    right: 0;        
+    width: 480px;   
+    height: 45px;   
+    background-color: #01497C;
+    color: white;    
+  
+    /**
+    * Da forma al contorno: esquina izquierda diagonal (\) y derecha normal 
+    */
+    clip-path: polygon(
+      0 0,         
+      20px 100%,   
+      100% 100%,   
+      100% 0      
+    );
+  
+    /**
+    * Bordes redondeados en el lado derecho 
+    */
+    border-top-right-radius: 40px;
+    border-bottom-right-radius: 40px;
+  
+    /**
+    * Sombra para dar profundidad 
+    */
+    box-shadow: -2px -2px 10px rgba(0, 0, 0, 0.3);
+  
+    /* 
+    *Asegura que esté por encima de otros elementos 
+    */
+    z-index: 999;
+  }
+  
+  /**
+  *Imagen del logo en el footer 
+  */
+  .footer-logo {
+    height: 28px;       
+    width: auto;        
+    border-radius: 4px; 
+  }
+  
+  /**
+    *Título principal del footer
+ */
+  .footer-title {
+    font-weight: bold;       
+    font-size: 1rem;        
+    letter-spacing: 1px;     
+    color: white;            
+  }
+  
+  /**
+  * Palabra "WITH" más pequeña 
+  */
+  .footer-title .smaller {
+    font-size: 0.75rem;     
+    margin: 0 6px;          
+  }
+  
+  /**
+  *Contenedor para la "I" con el símbolo ® 
+  */
+  .footer-r {
+    position: relative;      
+  }
+  
+  /**
+  * Estilo del símbolo ® 
+  */
+  .footer-r sup {
+    font-size: 0.5rem;       /* Tamaño pequeño */
+    position: absolute;      
+    top: -0.7rem;            /* Lo sube hacia arriba */
+    right: -0.4rem;          
+  }
+  
