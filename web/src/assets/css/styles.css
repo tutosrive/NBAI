@@ -1,6 +1,7 @@
 /* Card body container */
 .climate-card {
   box-shadow: 6px 5px 14px rgba(0, 0, 0, 0.637);
+  border: 1px solid white;
 }
 /* To give shadow to img in the backdrop */
 .shadow-img {
@@ -15,16 +16,22 @@
 }
 /* Vertical separator */
 .vl {
-  height: 40px;
-  width: 1px;
-  border-left: 1px solid rgba(0, 0, 0, 0.336);
   position: absolute;
-  display: inline;
-  right: 150px;
+  /* display: inline; */
 }
 
+.climate-card-wrapper {
+  max-width: 500px; /* Ajusta este valor según lo necesites */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.climate-icon {
+  max-width: 60px; /* Ajusta este valor según lo necesites */
+  height: auto;
+}
 .sidebar {
-  height: 35vh;
+  height: 160px;
   width: 50px;
   top: 25vh;
   background-color: #27364294;
@@ -46,4 +53,27 @@
 
 .dropdown-menu {
   z-index: 9999; /* Asegurémonos de que también tenga un z-index alto */
+}
+
+.just-icon-weather {
+  width: 100px;
+}
+
+.loading_map {
+  aspect-ratio: 1;
+  width: 300px;
+  background-color: #946b2d;
+  color: white;
+  font-size: x-large;
+  font-weight: 900;
+}
+
+/* Media query para dispositivos con un ancho máximo de 400px (similar al de la imagen) */
+@media (max-width: 416px) {
+  .container-climate {
+    padding-left: 90px !important;
+  }
+  .climate-card-wrapper {
+    max-width: 200px; /* Ancho más pequeño para dispositivos móviles pequeños */
+  }
 }

@@ -10,6 +10,7 @@
 
 body {
   background-color: var(--color-1);
+  background-image: none !important;
   color: var(--color-light);
   font-family: "Courier New", Courier, monospace;
   margin: 0;
@@ -104,6 +105,7 @@ body {
 
 .ranking {
   background-color: var(--color-3);
+  height: 215px;
 }
 
 .form-select {
