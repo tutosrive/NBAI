@@ -1,11 +1,14 @@
 import UserController from "./User.controller.js";
 import Events from "../models/Events.event.js";
+import { get_data } from "../services/GameScoreManager.service.js";
+import { get_flags } from "../services/GeoDataProvider.service.js";
 
 export default class HomeGame {
   static boardSizeOptions;
   static boardSizeSelect;
   static rankCheckboxes;
   static startButton;
+  static ranking_container;
 
   static init() {
     this.boardSizeOptions = {
@@ -36,9 +39,30 @@ export default class HomeGame {
     this.boardSizeSelect = document.getElementById("board");
     this.rankCheckboxes = document.querySelectorAll('input[name="rank"]');
     this.startButton = document.querySelector(".btn-start");
+    this.ranking_container = document.querySelector("#ranking-sect");
     this.#setupRankSelection();
     this.#setDefaultRankSelection();
     this.#setupStartButton();
+    this.load_ranking();
+  }
+
+  static async load_ranking() {
+    const data = await get_data(`${URL_API}/ranking`);
+    const div_ranking = (data) => {
+      const flag = data.country_code ? `<img class="flag-img" src="${get_flags(data.country_code)}" alt="Flag of ${data.country_code}"/>` : "---";
+      return `<div class="row row-cols-3 w-100 text-center p-0 m-0 overflow-y-scroll align-items-center">
+      <div class="col"><p>${data.nick_name}</p></div><div class="col"><p>${data.score}</p></div>
+      <div class="col">${flag}</div></div>`;
+    };
+    console.log(data);
+
+    if (data) {
+      data.data.forEach((ranking_info) => {
+        this.ranking_container.innerHTML += div_ranking(ranking_info);
+      });
+      return;
+    }
+    this.ranking_container.innerHTML += div_ranking({ nick_name: "----", score: "----" });
   }
 
   static #initializeTooltips() {

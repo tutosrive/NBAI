@@ -1,28 +1,27 @@
 let timeout;
 
-export async function winner() {
+export async function winner(message) {
   const container = document.querySelector("#main");
   const res = await fetch("./html/Winner.html");
   const html = await res.text();
   container.innerHTML += html;
-  load_winner();
+  load_winner(message);
 }
 
-function load_winner() {
+function load_winner(message) {
   // Elementos del DOM
   const overlay = document.querySelector(".popup-overlay");
   const popup = document.querySelector(".popup-container");
-  const btnPlayAgain = document.querySelector(".play-again");
   const btnExitGame = document.querySelector(".exit-game");
-  showPopup(overlay, popup);
+  showPopup(overlay, popup, message);
   // Event listeners
-  btnPlayAgain.addEventListener("click", restartGame);
   btnExitGame.addEventListener("click", exitGame);
 }
 
 // Mostrar el popup
-function showPopup(overlay, popup) {
+function showPopup(overlay, popup, message) {
   overlay.style.display = "flex";
+  document.querySelector("#msg-end-game").innerHTML = message;
   popup.style.animation = "popIn 0.3s ease-out";
 }
 

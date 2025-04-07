@@ -1,12 +1,21 @@
 import Ship from "../models/Ship.model.js";
 import { send_data } from "../services/GameScoreManager.service.js";
 import Gemini from "../services/Gemini.service.js";
-import { getBoardSize } from "./helpers/helpers.mjs";
+import { fetchText } from "./helpers/helpers.mjs";
 import ScoreCalculator from "./ScoreCalculator.controller.js";
 import { winner } from "./Winner.controller.js";
 
 export async function init() {
-  load_maps(); // Llama a load_maps directamente, el HTML ya está cargado
+  document.addEventListener("PlayerPlay", (e) => {
+    const data = e.detail;
+    window.DATA_MAP = data;
+    console.log(data);
+    Toast.show({ message: "Please wait a moment..." });
+    let timeout = setTimeout(() => {
+      load_maps(data); // Llama a load_maps directamente, el HTML ya está cargado
+      timeout = null;
+    }, 1000);
+  });
 }
 
 let BOARD_SIZE; // Tamaño por defecto, configurable entre 10 y 20
@@ -43,8 +52,8 @@ function showToast(message) {
   document.body.appendChild(backdrop);
 
   let timeout = setTimeout(() => {
+    backdrop.parentNode.removeChild(backdrop);
     if (backdrop && backdrop.parentNode) {
-      backdrop.parentNode.removeChild(backdrop);
     }
     aiMessageToast.classList.remove("show"); // Remover el backdrop
     timeout = null;
@@ -191,6 +200,7 @@ function registerHit(row, col, ships) {
     const hitPosition = ship.positions.find((pos) => pos.row === row && pos.col === col);
     if (hitPosition) {
       ship.hit();
+      Toast.show({ message: "(¡BOOM 💥!)" });
       return true;
     }
   }
@@ -214,7 +224,7 @@ function handleAttack(cell, board, ships, isPlayerTurn) {
       cell.classList.add("ship");
     }
     scoreCalculator.recordHit(); // Registrar acierto
-    if (checkWin(ships, isPlayerTurn ? "¡Ganaste!" : "¡Perdiste!")) return;
+    if (checkWin(ships, isPlayerTurn ? "Congratulations! You've defeated the enemy." : "Game Over")) return;
     if (!isPlayerTurn) {
       setTimeout(machineTurn, 1500);
     }
@@ -334,22 +344,36 @@ async function checkWin(ships, message) {
   const allSunk = ships.every((ship) => ship.isSunk());
   if (allSunk) {
     const finalScore = scoreCalculator.getTotalScore();
-    winner();
+    const msg = `<p>${message}</p><br><p>Score Level: <strong>${finalScore}</strong></p>`;
+    winner(msg);
     const user = JSON.parse(localStorage.getItem("user_nbai"));
     user.score += finalScore;
-    const data = { nick_name: user.nickname, score: parseInt(user.score, 10), country_code: user.country.code };
+    user.score_level = finalScore;
+    localStorage.setItem("user_nbai", JSON.stringify(user));
+    const data = { nick_name: user.nickname, score: finalScore, country_code: user.country.code.toUpperCase() };
     // Send info to backend
     await send_data(`${URL_API}/score-recorder`, data);
     currentTurn = null; // Game over
     disableMachineBoard();
     return true;
   }
+
   return false;
 }
 
-function exportPlayerMap() {
+function exportPlayerMap(player) {
   const boardSize = BOARD_SIZE; // Utiliza la variable global BOARD_SIZE
-  const playerBoardElement = document.querySelector("#player-board");
+  let playerBoardElement;
+
+  if (player === "user") {
+    playerBoardElement = document.querySelector("#player-board");
+  } else if (player === "machine") {
+    playerBoardElement = document.querySelector("#machine-board"); // Asegúrate de que este ID exista en tu HTML para el tablero de la máquina
+  } else {
+    console.error("Parámetro inválido para exportar el mapa. Debe ser 'user' o 'machine'.");
+    return null;
+  }
+
   const rows = playerBoardElement.querySelectorAll(".board > div");
   const mapMatrix = Array(boardSize)
     .fill(null)
@@ -359,9 +383,9 @@ function exportPlayerMap() {
     const cells = row.querySelectorAll(".cell");
     cells.forEach((cell, colIndex) => {
       if (cell.classList.contains("hit") && cell.classList.contains("ship")) {
-        mapMatrix[rowIndex][colIndex] = "p1-h";
+        mapMatrix[rowIndex][colIndex] = player === "user" ? "p1-h" : "p2-h"; // Assuming "p2" for machine
       } else if (cell.classList.contains("ship")) {
-        mapMatrix[rowIndex][colIndex] = "p1";
+        mapMatrix[rowIndex][colIndex] = player === "user" ? "p1" : "p2"; // Assuming "p2" for machine
       } else if (cell.classList.contains("miss")) {
         mapMatrix[rowIndex][colIndex] = "b";
       } else {
@@ -373,61 +397,60 @@ function exportPlayerMap() {
   return mapMatrix;
 }
 
-function handleExportPlayerMap() {
-  const exportedMap = exportPlayerMap();
+function handleExportPlayerMap(player) {
+  const exportedMap = exportPlayerMap(player);
   console.log("Mapa del Jugador Exportado (Matriz):");
   console.log(exportedMap);
   showToast("Mapa del Jugador Exportado a la consola como matriz"); // Opcional: mostrar un mensaje al usuario
 }
 
-function load_maps() {
-  getBoardSize((size) => {
-    BOARD_SIZE = size; // Load Maps
-    scoreCalculator = new ScoreCalculator();
+function load_maps(data = null) {
+  const data_nbai = JSON.parse(localStorage.getItem("DATA_NBAI"));
+  BOARD_SIZE = data ? data.SIZE : parseInt(data_nbai.SIZE, 10); // Load Maps
+  scoreCalculator = new ScoreCalculator();
 
-    currentTurn = null;
-    orientation = "horizontal";
+  currentTurn = null;
+  orientation = "horizontal";
 
-    playerBoard = document.querySelector("#player-board");
-    machineBoard = document.querySelector("#machine-board");
-    orientationBtn = document.querySelector("#orientation-button");
-    shipInfoPanel = document.querySelector("#div-info-some");
-    shipInfoPanel.classList.remove("visually-hidden");
-    aiMessageToast = document.querySelector("#ai-message-toast");
-    aiMessageToastBody = document.querySelector("#ai-message-toast-body");
+  document.body.style = `background-image: url('./Resources/${DATA_MAP.MAP}.png'); background-attachment: fixed; background-position: center;`;
+  playerBoard = document.querySelector("#player-board");
+  machineBoard = document.querySelector("#machine-board");
+  orientationBtn = document.querySelector("#orientation-button");
+  shipInfoPanel = document.querySelector("#div-info-some");
+  shipInfoPanel.classList.remove("visually-hidden");
+  aiMessageToast = document.querySelector("#ai-message-toast");
+  aiMessageToastBody = document.querySelector("#ai-message-toast-body");
 
-    playerShips = [];
-    machineShips = [];
-    shipIndex = 0;
-    updateShipInfoPanel();
-    disableMachineBoard();
-    aiPreviousTargets = [];
+  playerShips = [];
+  machineShips = [];
+  shipIndex = 0;
+  updateShipInfoPanel();
+  disableMachineBoard();
+  aiPreviousTargets = [];
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key.toUpperCase() === "R") {
-        orientation = orientation === "horizontal" ? "vertical" : "horizontal";
-        orientationBtn.textContent = `Ship to ${orientation.charAt(0).toUpperCase() + orientation.slice(1)}`;
-      }
-    });
-
-    orientationBtn.addEventListener("click", () => {
+  document.addEventListener("keydown", (e) => {
+    if (e.key.toUpperCase() === "R") {
       orientation = orientation === "horizontal" ? "vertical" : "horizontal";
       orientationBtn.textContent = `Ship to ${orientation.charAt(0).toUpperCase() + orientation.slice(1)}`;
-    });
-
-    const boardsContainer = document.querySelector(".boards"); // row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-2
-    boardsContainer.classList.add("row-cols-1", "row-cols-sm-2", "row-cols-md-2", "row-cols-lg-2"); // }
-    createBoard(playerBoard, true);
-    createBoard(machineBoard, false);
-
-    const exportButton = document.querySelector("#export-player-map");
-    if (exportButton) {
-      exportButton.addEventListener("click", handleExportPlayerMap);
-    } // Event listeners for ship preview
-
-    playerBoard.addEventListener("mouseover", showShipPreview);
-    playerBoard.addEventListener("mouseout", clearShipPreview);
+    }
   });
+
+  orientationBtn.addEventListener("click", () => {
+    orientation = orientation === "horizontal" ? "vertical" : "horizontal";
+    orientationBtn.textContent = `Ship to ${orientation.charAt(0).toUpperCase() + orientation.slice(1)}`;
+  });
+
+  const boardsContainer = document.querySelector(".boards"); // row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-2
+  boardsContainer.classList.add("row-cols-1", "row-cols-sm-2", "row-cols-md-2", "row-cols-lg-2"); // }
+  createBoard(playerBoard, true);
+  createBoard(machineBoard, false);
+
+  const export_user_button = document.querySelector("#export-player-map");
+  const export_machine_button = document.querySelector("#export-machine-map");
+  if (export_user_button) export_user_button.addEventListener("click", () => handleExportPlayerMap("user")); // Event listeners for ship preview
+  if (export_machine_button) export_machine_button.addEventListener("click", () => handleExportPlayerMap("machine"));
+  playerBoard.addEventListener("mouseover", showShipPreview);
+  playerBoard.addEventListener("mouseout", clearShipPreview);
 }
 
 function showShipPreview(event) {
