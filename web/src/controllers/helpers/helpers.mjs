@@ -73,8 +73,9 @@ export async function getBoardSize(callback) {
   window.handleOk = () => {
     if (input.checkValidity()) {
       callback(Number(input.value));
+      const modal_1 = document.querySelector("#boardModal");
       modal.hide();
-      document.getElementById("boardModal").remove();
+      if (modal_1) document.body.removeChild(modal_1);
     } else {
       document.querySelector(".text-danger").classList.remove("d-none");
     }
