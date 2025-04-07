@@ -23,3 +23,27 @@
   right: 150px;
 }
 
+.sidebar {
+  height: 35vh;
+  width: 50px;
+  top: 25vh;
+  background-color: #27364294;
+  box-shadow: 1px 1px 5px black;
+  z-index: 1070;
+}
+
+.play {
+  color: #946b2d;
+}
+
+.person-circle {
+  color: white !important;
+}
+
+.dropdown {
+  z-index: 9999;
+}
+
+.dropdown-menu {
+  z-index: 9999; /* Asegurémonos de que también tenga un z-index alto */
+}
