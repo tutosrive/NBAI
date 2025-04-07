@@ -6,12 +6,7 @@ import ScoreCalculator from "./ScoreCalculator.controller.js";
 import { winner } from "./Winner.controller.js";
 
 export async function init() {
-  const container = document.querySelector("#main");
-  const res = await fetch("./html/Map.html");
-  const html = await res.text();
-  console.log(html);
-  container.innerHTML = html;
-  load_maps();
+  load_maps(); // Llama a load_maps directamente, el HTML ya está cargado
 }
 
 let BOARD_SIZE; // Tamaño por defecto, configurable entre 10 y 20
@@ -48,11 +43,10 @@ function showToast(message) {
   document.body.appendChild(backdrop);
 
   let timeout = setTimeout(() => {
-    aiMessageToast.classList.remove("show"); // Remover el backdrop
-
     if (backdrop && backdrop.parentNode) {
       backdrop.parentNode.removeChild(backdrop);
     }
+    aiMessageToast.classList.remove("show"); // Remover el backdrop
     timeout = null;
   }, 3000);
 }
