@@ -1,8 +1,9 @@
+let timeout;
+
 export async function winner() {
   const container = document.querySelector("#main");
   const res = await fetch("./html/Winner.html");
   const html = await res.text();
-  console.log(html);
   container.innerHTML += html;
   load_winner();
 }
@@ -33,12 +34,18 @@ function hidePopup() {
 // Reiniciar el juego
 function restartGame() {
   hidePopup();
-  alert("Reiniciando juego...");
-  location.reload();
+  load_home();
 }
 
 // Salir del juego
 function exitGame() {
-  alert("Saliendo del juego...");
-  location.reload();
+  Toast.show({ message: "Returning to the beginning" });
+  load_home();
+}
+
+function load_home() {
+  timeout = setTimeout(() => {
+    location.hash = "#home";
+    timeout = null;
+  }, 3000);
 }
