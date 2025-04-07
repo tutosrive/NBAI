@@ -1,15 +1,17 @@
+<link rel="stylesheet" href="../assets/css/map.css" />
 <div class="flex-grow-1 p-4 section-maps">
   <h1 class="text-center">Naval Battle AI &lpar;<strong>NBAI</strong>&rpar;</h1>
   <div class="text-center mt-4 d-flex justify-content-center flex-wrap">
-    <div class="mt-2 mx-2"><button id="orientation-button" class="btn btn-success">Ship to Vertical</button></div>
-    <div class="mt-2"><button id="export-player-map" class="btn btn-primary">Export Map</button></div>
+    <div class="mt-2"><button id="orientation-button" class="btn btn-success">Ship to Vertical</button></div>
+    <div class="mt-2 mx-2"><button id="export-player-map" class="btn btn-primary">Export User</button></div>
+    <div class="mt-2"><button id="export-machine-map" class="btn btn-primary">Export Machine</button></div>
   </div>
   <div class="d-flex justify-content-center mt-4 row"><div id="div-info-some" class="bg-primary col-9 col-sm-6 col-md-5 col-lg-4 text-center p-2 visually-hidden"></div></div>
   <div class="boards justify-content-center row">
     <div class="col">
       <div class="text-center mt-3"><h2>Player</h2></div>
       <div class="board-container text-center overflow-scroll">
-        <div id="player-board" class="board"></div>
+        <div id="player-board" class="board"><div class="loading_map d-flex align-items-center justify-content-center">Loading...</div></div>
       </div>
     </div>
     <div class="col">
@@ -24,38 +26,33 @@
             <div id="ai-message-toast-body" class="toast-body"></div>
           </div>
         </div>
-        <div id="machine-board" class="board"></div>
+        <div id="machine-board" class="board"><div class="loading_map d-flex align-items-center justify-content-center">Loading...</div></div>
       </div>
     </div>
   </div>
-<<<<<<< HEAD
   <div>
     <div class="container text-center">
       <div class="row align-items-center">
         <div class="col">
-          <img width="400 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship9-115.svg" alt="Aircraft Carrier" class="img-fluid">
+          <img width="400 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship9-115.svg" alt="Aircraft Carrier" class="img-fluid" />
         </div>
         <div class="col">
-          <img width="120 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship4-475.svg" alt="Battleship" class="img-fluid">
+          <img width="120 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship4-475.svg" alt="Battleship" class="img-fluid" />
         </div>
         <div class="col">
-          <img width="120 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship1-35.svg" alt="Cruiser" class="img-fluid">
+          <img width="120 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship1-35.svg" alt="Cruiser" class="img-fluid" />
         </div>
         <div class="col">
-          <img width="120 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship1-35.svg" alt="Cruiser" class="img-fluid">
+          <img width="120 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship1-35.svg" alt="Cruiser" class="img-fluid" />
         </div>
         <div class="col">
-          <img width="120 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship5-submarine.svg" alt="Submarine" class="img-fluid">
+          <img width="120 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship5-submarine.svg" alt="Submarine" class="img-fluid" />
         </div>
         <div class="col">
-          <img width="120 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship5-submarine.svg" alt="Submarine" class="img-fluid">
+          <img width="120 px" src="https://cdn.jsdelivr.net/gh/tutosrive/images-projects-srm-trg@main/NBAI/ships/svg/ships-military-v1.0/ship5-submarine.svg" alt="Submarine" class="img-fluid" />
         </div>
       </div>
     </div>
   </div>
-  <script defer src="../controllers/Map.controller.js"></script>
-  
-=======
+  <!-- <script defer src="../controllers/Map.controller.js"></script> -->
 </div>
-<script defer src="../controllers/Map.controller.js"></script>
->>>>>>> 46d307938280e5274fa0989547929597613a27ff

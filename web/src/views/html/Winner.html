@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game Result</title>
-    <link rel="stylesheet" href="../../assets/css/Winner.css">
-</head>
-<body>
+    <link rel="stylesheet" href="../assets/css/Winner.css" />
+  </head>
+  <body>
     <div class="popup-overlay">
-        <div class="popup-container">
-            <div class="popup-header">
-                <h2 class="popup-title">YOU WON !</h2> 
-            </div>
-            <div class="popup-body">
-                <p class="popup-message">Congratulations! You've defeated the enemy.</p>
-            <div class="popup-footer">
-                <button class="popup-button play-again">Play Again</button>
-                <button class="popup-button exit-game">Exit</button>
-            </div>
+      <div class="popup-container">
+        <div class="popup-header">
+          <h2 class="popup-title">End Game</h2>
         </div>
+        <div class="popup-body">
+          <p class="popup-message" id="msg-end-game"></p>
+        </div>
+        <div class="popup-footer">
+          <button class="popup-button exit-game">Exit</button>
+        </div>
+      </div>
     </div>
     <script src="../../controllers/Winner.controller.js"></script>
-</body>
+  </body>
 </html>
