@@ -113,10 +113,10 @@ export default class UserController {
       Toast.show({ title: "Information", message: `Please fill all fields`, mode: "warning" });
       return;
     }
-    const country_info = { code: this.#__country_selected.value, name: this.#__country_selected.textContent };
+    const country_info = { code: this.#__country_selected.value.toUpperCase(), name: this.#__country_selected.textContent };
     localStorage.setItem("user_nbai", JSON.stringify({ user_name: user_name_input.value, nickname: nickname_input.value, country: country_info, city: city_input.value, score: 0, score_level: 0 }));
     // Send data to API
-    const response = await send_data(`${URL_API}/score-recorder`, { nick_name: nickname_input.value, country_code: this.#__country_selected.value, score: 0 });
+    const response = await send_data(`${URL_API}/score-recorder`, { nick_name: nickname_input.value, country_code: this.#__country_selected.value.toUpperCase(), score: 0 });
     if (response.status !== 200) {
       Toast.show({ title: "Error", message: `Error sending data`, mode: "danger" });
       return;
