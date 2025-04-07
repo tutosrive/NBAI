@@ -14,7 +14,6 @@ export default class DOMClimate {
     this.#container = container;
     this.#climate = climate;
     this.#icon_weather = icon;
-    console.log(this.#climate);
 
     this.#climate.main.temp = Helps.convert_kelvin_celcius(this.#climate.main.temp);
     this.#page = page;

@@ -1,31 +1,35 @@
 import Ship from "../models/Ship.model.js";
 import { send_data } from "../services/GameScoreManager.service.js";
 import Gemini from "../services/Gemini.service.js";
-import { fetchText } from "./helpers/helpers.mjs";
+import { fetchText, toast_message } from "./helpers/helpers.mjs";
 import ScoreCalculator from "./ScoreCalculator.controller.js";
 import { winner } from "./Winner.controller.js";
 
 export async function init() {
+  let event_executed = false;
   document.addEventListener("PlayerPlay", (e) => {
+    event_executed = true;
     const data = e.detail;
     window.DATA_MAP = data;
-    console.log(data);
     Toast.show({ message: "Please wait a moment..." });
     let timeout = setTimeout(() => {
       load_maps(data); // Llama a load_maps directamente, el HTML ya está cargado
       timeout = null;
     }, 1000);
   });
+  if (event_executed === false) {
+    load_maps();
+  }
 }
 
 let BOARD_SIZE; // Tamaño por defecto, configurable entre 10 y 20
 let SHIPS_CONFIG = [
-  { size: 5, name: "aircraft carrier", id: "carrier" },
-  { size: 4, name: "battleship", id: "battleship" },
-  { size: 3, name: "cruiser", id: "cruiser1" },
-  { size: 3, name: "cruiser", id: "cruiser2" },
-  { size: 2, name: "submarine", id: "submarine1" },
-  { size: 2, name: "submarine", id: "submarine2" },
+  { size: 5, name: "Aircraft carrier", id: "carrier" },
+  { size: 4, name: "Battleship", id: "battleship" },
+  { size: 3, name: "Cruiser", id: "cruiser1" },
+  { size: 3, name: "Cruiser", id: "cruiser2" },
+  { size: 2, name: "Submarine", id: "submarine1" },
+  { size: 2, name: "Submarine", id: "submarine2" },
 ];
 
 let scoreCalculator;
@@ -44,6 +48,7 @@ let shipIndex = 0; // Index of the ship being placed by the player
 let aiPreviousTargets = []; // Inicializa el array para almacenar los objetivos de la IA
 
 function showToast(message) {
+  document.querySelector(".modal-backdrop")?.remove();
   aiMessageToastBody.innerHTML = `<strong>${message}</strong>`;
   aiMessageToast.classList.add("show"); // Crear y añadir el backdrop usando las clases de Bootstrap
 
@@ -52,9 +57,7 @@ function showToast(message) {
   document.body.appendChild(backdrop);
 
   let timeout = setTimeout(() => {
-    backdrop.parentNode.removeChild(backdrop);
-    if (backdrop && backdrop.parentNode) {
-    }
+    document.querySelector(".modal-backdrop")?.remove();
     aiMessageToast.classList.remove("show"); // Remover el backdrop
     timeout = null;
   }, 3000);
@@ -89,14 +92,6 @@ function createBoard(container, isPlayer) {
     }
     container.appendChild(rowDiv);
   }
-}
-
-function indexToCoord(index) {
-  return { row: Math.floor(index / BOARD_SIZE), col: index % BOARD_SIZE };
-}
-
-function coordToIndex(row, col) {
-  return row * BOARD_SIZE + col;
 }
 
 function canPlaceShipPreview(board, startRow, startCol, size, orientation) {
@@ -134,7 +129,7 @@ function updateShipInfoPanel() {
     const currentShip = SHIPS_CONFIG[shipIndex];
     shipInfoPanel.innerHTML = `<span class="badge text-bg-warning">Placing: ${currentShip.name}</span> <span class="badge text-bg-info">Size: ${currentShip.size}</span>`;
   } else {
-    shipInfoPanel.classList.add("bg-succes");
+    shipInfoPanel.classList.add("bg-success");
     shipInfoPanel.textContent = "All ships placed!";
     shipInfoPanel.classList.add("visually-hidden");
   }
@@ -195,12 +190,16 @@ function disableMachineBoard() {
   cells.forEach((cell) => cell.classList.remove("enabled"));
 }
 
-function registerHit(row, col, ships) {
+function registerHit(row, col, ships, currentTurn) {
   for (const ship of ships) {
     const hitPosition = ship.positions.find((pos) => pos.row === row && pos.col === col);
     if (hitPosition) {
       ship.hit();
-      Toast.show({ message: "(¡BOOM 💥!)" });
+      if (ship.isSunk() === true) {
+        const txt_color = currentTurn === "player" ? "green" : "red";
+        toast_message(`<p class="mb-0 text-${txt_color}">¡<strong>${ship.name}</strong> has been sunk!</p>`);
+      }
+      Toast.show({ message: `BOOM 💥: By ${currentTurn}` });
       return true;
     }
   }
@@ -215,17 +214,17 @@ function handleAttack(cell, board, ships, isPlayerTurn) {
   const col = parseInt(cell.dataset.col);
   if (cell.classList.contains("hit") || cell.classList.contains("miss")) return;
 
-  const wasHit = registerHit(row, col, ships);
+  const wasHit = registerHit(row, col, ships, currentTurn);
 
-  if (wasHit) {
+  if (wasHit === true) {
     cell.classList.add("hit");
     cell.textContent = "❌";
-    if (!cell.classList.contains("ship")) {
+    if (cell.classList.contains("ship") === false) {
       cell.classList.add("ship");
     }
     scoreCalculator.recordHit(); // Registrar acierto
-    if (checkWin(ships, isPlayerTurn ? "Congratulations! You've defeated the enemy." : "Game Over")) return;
-    if (!isPlayerTurn) {
+    if (checkWin(ships, isPlayerTurn ? "Congratulations! You've defeated the enemy." : "Game Over") === true) return;
+    if (isPlayerTurn === false) {
       setTimeout(machineTurn, 1500);
     }
   } else {
@@ -234,9 +233,9 @@ function handleAttack(cell, board, ships, isPlayerTurn) {
     currentTurn = isPlayerTurn ? "machine" : "player";
 
     // Lógica para verificar si el fallo estuvo adyacente a un barco enemigo
-    if (isPlayerTurn) {
+    if (isPlayerTurn === true) {
       const isNearMiss = checkNearMiss(row, col, machineShips);
-      if (isNearMiss) {
+      if (isNearMiss === true) {
         scoreCalculator.recordNearMiss(); // Registrar fallo cercano
       } else {
         scoreCalculator.recordMiss(); // Registrar fallo normal
@@ -295,11 +294,9 @@ async function machineTurn() {
 
   const thinkingDelay = Math.random() * 2000 + 1000; // 1 to 3 seconds
   showToast("AI is thinking...");
-  console.log("AI is thinking...");
   await new Promise((resolve) => setTimeout(resolve, thinkingDelay));
 
   const playerMatrix = getPlayerBoardMatrix();
-  console.log("Player Board Matrix:", playerMatrix); // Added this line
   const geminiResponse = await Gemini.init(playerMatrix, aiPreviousTargets); // Pasa aiPreviousTargets
 
   if (geminiResponse.status === 200 && geminiResponse.data?.position) {
@@ -368,7 +365,7 @@ function exportPlayerMap(player) {
   if (player === "user") {
     playerBoardElement = document.querySelector("#player-board");
   } else if (player === "machine") {
-    playerBoardElement = document.querySelector("#machine-board"); // Asegúrate de que este ID exista en tu HTML para el tablero de la máquina
+    playerBoardElement = document.querySelector("#machine-board");
   } else {
     console.error("Parámetro inválido para exportar el mapa. Debe ser 'user' o 'machine'.");
     return null;
@@ -385,7 +382,12 @@ function exportPlayerMap(player) {
       if (cell.classList.contains("hit") && cell.classList.contains("ship")) {
         mapMatrix[rowIndex][colIndex] = player === "user" ? "p1-h" : "p2-h"; // Assuming "p2" for machine
       } else if (cell.classList.contains("ship")) {
-        mapMatrix[rowIndex][colIndex] = player === "user" ? "p1" : "p2"; // Assuming "p2" for machine
+        // Solo para el mapa de la máquina, si es un barco pero no ha sido golpeado, lo marcamos como agua ("a")
+        if (player === "machine") {
+          mapMatrix[rowIndex][colIndex] = "a";
+        } else {
+          mapMatrix[rowIndex][colIndex] = player === "user" ? "p1" : "p2";
+        }
       } else if (cell.classList.contains("miss")) {
         mapMatrix[rowIndex][colIndex] = "b";
       } else {
@@ -399,20 +401,20 @@ function exportPlayerMap(player) {
 
 function handleExportPlayerMap(player) {
   const exportedMap = exportPlayerMap(player);
-  console.log("Mapa del Jugador Exportado (Matriz):");
+  console.log(`Mapa "${player}" Exportado (Matriz):`);
   console.log(exportedMap);
   showToast("Mapa del Jugador Exportado a la consola como matriz"); // Opcional: mostrar un mensaje al usuario
 }
 
 function load_maps(data = null) {
-  const data_nbai = JSON.parse(localStorage.getItem("DATA_NBAI"));
+  const data_nbai = data ?? JSON.parse(localStorage.getItem("DATA_NBAI"));
   BOARD_SIZE = data ? data.SIZE : parseInt(data_nbai.SIZE, 10); // Load Maps
   scoreCalculator = new ScoreCalculator();
 
   currentTurn = null;
   orientation = "horizontal";
 
-  document.body.style = `background-image: url('./Resources/${DATA_MAP.MAP}.png'); background-attachment: fixed; background-position: center;`;
+  document.body.style = `background-image: url('./Resources/${data_nbai.MAP}.png'); background-attachment: fixed; background-position: center;`;
   playerBoard = document.querySelector("#player-board");
   machineBoard = document.querySelector("#machine-board");
   orientationBtn = document.querySelector("#orientation-button");

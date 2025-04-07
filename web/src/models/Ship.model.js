@@ -55,7 +55,6 @@ export default class Ship {
       if (this.resistence <= 0) {
         // Usar <= 0 por seguridad
         this._isSunk = true;
-        console.log(`${this.name} (ID: ${this.id}) ha sido hundido!`);
       }
     }
   }

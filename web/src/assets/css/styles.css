@@ -20,6 +20,11 @@
   /* display: inline; */
 }
 
+.menu-dropdown {
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.568) !important;
+}
+
 .climate-card-wrapper {
   max-width: 500px; /* Ajusta este valor según lo necesites */
   margin-left: auto;
@@ -56,7 +61,7 @@
 }
 
 .just-icon-weather {
-  width: 100px;
+  width: 80px;
 }
 
 .loading_map {
@@ -66,6 +71,23 @@
   color: white;
   font-size: x-large;
   font-weight: 900;
+}
+
+.toast_message_001 {
+  z-index: 99999;
+  background-color: #212529d9 !important;
+  border: 1px solid white !important;
+  font-family: Arial, Helvetica, sans-serif;
+  bottom: 40px;
+  max-width: 250px !important;
+}
+
+.text-green {
+  color: rgb(9, 255, 0) !important;
+}
+
+.text-red {
+  color: rgb(255, 0, 0) !important;
 }
 
 /* Media query para dispositivos con un ancho máximo de 400px (similar al de la imagen) */

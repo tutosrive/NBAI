@@ -45,20 +45,20 @@ h1 {
 }
 
 .cell:hover {
-  background-color: #0059ff !important;
+  background-color: #d0ff0050 !important;
 }
 
-.cell.ship {
-  background-color: #b446b4 !important;
+#player-board .ship {
+  background-color: #d8a600 !important;
 }
 
 .board .cell.preview {
-  background-color: rgba(0, 255, 0, 0.5) !important;
+  background-color: rgba(255, 217, 0, 0.5) !important;
   cursor: pointer;
 }
 
 .board .cell.preview:hover {
-  background-color: rgba(0, 255, 0, 0.7) !important;
+  background-color: rgba(255, 208, 0, 0.7) !important;
 }
 
 .board .cell.preview-invalid {
@@ -74,12 +74,12 @@ h1 {
 }
 
 .cell.miss {
-  background-color: #d3d3d3;
   font-size: 20px;
 }
 
+/* Machine, uncomment to debug */
 #machine-board .ship {
-  background-color: transparent; /* Oculta barcos del enemigo */
+  background-color: blue;
 }
 
 button {

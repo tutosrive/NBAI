@@ -54,7 +54,6 @@ export default class HomeGame {
       <div class="col"><p>${data.nick_name}</p></div><div class="col"><p>${data.score}</p></div>
       <div class="col">${flag}</div></div>`;
     };
-    console.log(data);
 
     if (data) {
       data.data.forEach((ranking_info) => {

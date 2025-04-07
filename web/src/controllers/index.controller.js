@@ -47,16 +47,12 @@ class App {
   }
 
   static async #loadContent(hash) {
-    if (App.#isLoadingContent) {
-      console.log("Carga de contenido en curso, ignorando:", hash);
-      return;
-    }
+    if (App.#isLoadingContent) return;
     App.#isLoadingContent = true;
     const __user = localStorage.getItem("user_nbai");
     document.querySelector("#dialog-001") ? document.body.removeChild(document.querySelector("#dialog-001")) : null;
-    console.log("Cargando:", hash);
     const routeName = hash.substring(1);
-    document.title = `Mi Sitio - ${routeName.charAt(0).toUpperCase() + routeName.slice(1)}`;
+    document.title = `NBAI - ${routeName.charAt(0).toUpperCase() + routeName.slice(1)}`;
 
     App.#main_container.innerHTML = App.#routes[hash] || `<h1>Página no encontrada: ${hash}</h1>`; // Inicializar el controlador del mapa si la ruta es #map
 
@@ -81,7 +77,6 @@ class App {
     window.CITY_USER = JSON.parse(__user).city;
     window.COUNTRY_NAME = JSON.parse(__user).country.name;
     const climate = (await getWeather(CITY_USER)).data ?? "Manizales";
-    console.log(climate);
 
     new DOMClimate(this.#climate_container, climate, get_weather_icons(climate.weather[0].icon), page);
   }
@@ -104,7 +99,6 @@ class App {
 
         if (hash === "#user/logout") {
           const __user = localStorage.getItem("user_nbai");
-          console.log(__user);
           if (!__user) return Toast.show({ message: "There are no registered users, please Sign Up", mode: "warning" });
 
           localStorage.removeItem("user_nbai");

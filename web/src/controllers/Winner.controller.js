@@ -1,4 +1,5 @@
 let timeout;
+let overlay;
 
 export async function winner(message) {
   const container = document.querySelector("#main");
@@ -10,12 +11,14 @@ export async function winner(message) {
 
 function load_winner(message) {
   // Elementos del DOM
-  const overlay = document.querySelector(".popup-overlay");
+  overlay = document.querySelector(".popup-overlay");
   const popup = document.querySelector(".popup-container");
   const btnExitGame = document.querySelector(".exit-game");
+  const btnReload = document.querySelector(".reload-game");
   showPopup(overlay, popup, message);
   // Event listeners
   btnExitGame.addEventListener("click", exitGame);
+  btnReload.addEventListener("click", reloadGame);
 }
 
 // Mostrar el popup
@@ -31,14 +34,16 @@ function hidePopup() {
 }
 
 // Reiniciar el juego
-function restartGame() {
+function reloadGame() {
   hidePopup();
-  load_home();
+  Toast.show({ message: "Playing Again" });
+  location.reload();
 }
 
-// Salir del juego
+// Reload game
 function exitGame() {
-  Toast.show({ message: "Returning to the beginning" });
+  hidePopup();
+  Toast.show({ message: "Return Home" });
   load_home();
 }
 

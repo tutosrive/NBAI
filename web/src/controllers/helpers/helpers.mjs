@@ -52,33 +52,29 @@ export async function fetchText(url, container = null) {
 }
 
 export const convert_kelvin_celcius = (kelkin_grades) => (kelkin_grades - 273.15).toFixed(2);
-export async function getBoardSize(callback) {
-  const modalHTML = `
-  <div class="modal fade" id="boardModal" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header justify-content-center"><h5 class="modal-title">Select board size</h5></div>
-        <div class="modal-body text-center justify-content-center">
-          <div class="d-flex justify-content-center"><input type="number" id="sizeInput" class="form-control mb-2 text-center w-50" min="10" max="20" placeholder="Min 10, Max 20" required></div>
-          <p class="text-danger d-none">Minimum value (10), Maximum value (20)!</p>
-        </div>
-        <div class="modal-footer"><button class="btn btn-primary" onclick="handleOk()">Accept</button></div>
-      </div>
-    </div>
-  </div>`;
-  document.body.insertAdjacentHTML("beforeend", modalHTML);
-  const modal = new bootstrap.Modal("#boardModal");
-  const input = document.getElementById("sizeInput");
+export async function toast_message(message) {
+  // Elimina el toast anterior si existe
+  const existingToastEl = document.querySelector("#toast1");
+  if (existingToastEl) existingToastEl.remove();
+  const toastHTML = `<div id="toast1" class="toast toast_message_001 position-fixed end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex w-100 align-items-center">
+      <div class="toast-body d-flex align-items-center justify-content-center">${message}</div>
+      <button type="button" class="btn-close ms-auto me-2" data-bs-dismiss="toast" aria-label="Close" style="margin-top: -0.1rem;"></button>
+    </div></div>`;
 
-  window.handleOk = () => {
-    if (input.checkValidity()) {
-      callback(Number(input.value));
-      const modal_1 = document.querySelector("#boardModal");
-      modal.hide();
-      if (modal_1) document.body.removeChild(modal_1);
-    } else {
-      document.querySelector(".text-danger").classList.remove("d-none");
+  document.body.insertAdjacentHTML("beforeend", toastHTML);
+  const toastEl = document.querySelector("#toast1"); // Selecciona el nuevo elemento toast
+  const toast = new bootstrap.Toast(toastEl); // Inicialízalo como un Toast de Bootstrap
+  toast.show();
+
+  let timeout = setTimeout(() => {
+    if (toastEl) {
+      toast.hide(); // Oculta el toast
+      toastEl.addEventListener("hidden.bs.toast", () => {
+        // Remueve el elemento después de que esté completamente oculto
+        toastEl ? toastEl.remove() : null;
+      });
     }
-  };
-  modal.show();
+    timeout = null;
+  }, 2000);
 }
